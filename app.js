@@ -7,9 +7,20 @@ import bodyParser from 'body-parser'
 
 import index from './routes/index'
 import users from './routes/users'
+import server from './routes/server'
+
+import mongoose from 'mongoose'
+import config from './config/database'
 
 const app = express()
 
+mongoose.connect(config.database)
+mongoose.connection.on('connected',()=>{
+  console.log("Connect to Database " + config.database)
+})
+mongoose.connection.on('error',(err)=>{
+  console.log("Database error : " + err)
+})
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -24,6 +35,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/api/v1',server)
 
 // catch 404 and forward to error handler
 app.use((req, res, next)=> {
