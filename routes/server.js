@@ -31,9 +31,9 @@ router.post("/addplayer",(req,res,next)=>{
 
 router.get("/private/deletedata/:id",(req,res,next)=>{
     const id = req.params.id
-    let dataObj = getDeletedData(id)
-    if(dataObj!=="nu"){
-        dataObj.then(data=>{
+    // let dataObj = getDeletedData(id)
+    // if(dataObj!=="nu"){
+        // .then(data=>{
                 if(id==="all"){
                     Player.remove({})
                         .then(result=>{
@@ -42,34 +42,34 @@ router.get("/private/deletedata/:id",(req,res,next)=>{
                 }else{
                     Player.remove({_id:id})
                         .then(result=>{
-                            res.send({status:0,msg:`${data} Deleted`})
+                            res.send({status:0,msg:`${id} Deleted`})
                         })
                         .catch(err=>next(err))
                 }
-            })      
-    }else{
-        dataObj
-            .then(err=>{
-                console.log(err)
-                res.send({status:0,msg:"No data to delete"})
+            // })      
+    // }else{
+        // dataObj
+            // .then(err=>{
+            //     console.log(err)
+            //     res.send({status:0,msg:"No data to delete"})
 
-            })
-    }
+            // })
+    // }
 })
 
-const getDeletedData = async id =>{
-    let temp = await new Promise((resolve,reject)=>{
-        Player.findOne({_id:id})
-        .then(result=>{
-            if(result)
-                resolve(result)
-            else
-                return reject("nu")
-        })
-        .catch(err=>resolve(err))
-    })
+// const getDeletedData = async id =>{
+//     let temp = await new Promise((resolve,reject)=>{
+//         Player.findOne({_id:id})
+//         .then(result=>{
+//             if(result)
+//                 resolve(result)
+//             else
+//                 return reject("nu")
+//         })
+//         .catch(err=>resolve(err))
+//     })
    
-    return temp
-}
+//     return temp
+// }
 
 export default router
