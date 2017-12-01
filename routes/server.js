@@ -1,27 +1,66 @@
 import express from 'express'
 import Player from '../models/player'
+import PlayerNormal from '../models/player_normal'
+import PlayerHard from '../models/player_hard'
 
 const router = express.Router()
 
 router.get("/getdata",(req,res,next)=>{
-    Player.find()
-        .exec()
-        .then(result=>{
-            res.send({status:0,data:result})
-        })
-        .catch(err=>{
-            next(err)
-        })
+    let allData = {}
+    // Player.find()
+    //     .exec()
+    //     .then(result=>{
+    //         // res.send({status:0,data:result})
+    //         allData.easy = result
+    //     })
+    //     .catch(err=>{
+    //         next(err)
+    //     })
 
+    // PlayerNormal.find()
+    //     .exec()
+    //     .then(result=>{
+    //         allData.normal = result
+    //     })
+    //     .catch(err=>next(err))
+
+    // PlayerHard.find()
+    //     .exec()
+    //     .then(result=>{
+    //         allData.hard = result
+    //     })
+    //     .catch(err=>next(err))
+    
+    
+    Promise.all([Player.find().exec(),PlayerNormal.find().exec(),PlayerHard.find().exec()])
+        .then(([resultEasy,resultNormal,resultHard])=>{
+            allData.easy = resultEasy
+            allData.normal = resultNormal
+            allData.hard = resultHard
+
+            res.send({status:0,data:allData})
+        })
+    
 })
 
-router.post("/addplayer",(req,res,next)=>{
-    const data = new Player({
+router.post("/addplayer/:mode",(req,res,next)=>{
+    const mode = req.params.mode
+    const data = {
         name : req.body.name,
         move : req.body.move,
         time : req.body.time
-    })
-    data.save()
+    }
+
+    let gameMode
+
+    if(mode==="easy")
+        gameMode = new Player(data);
+    else if(mode==="normal")
+        gameMode = new PlayerNormal(data)
+    else 
+        gameMode = new PlayerHard(data)
+
+    gameMode.save()
         .then(result=>{
             if(!result) res.send({status:-1,msg:"cannot add player to board"})
             else res.send({status:0,msg:"added to ranking board"})
